@@ -2,53 +2,74 @@
 
 ## Description
 
-This Python script fetches Bitcoin-related tweets and analyzes their sentiment using Twitter API and Azure AI Language services. It's designed for testing purposes using free-tier API limits.
+This Python script fetches Bitcoin-related tweets and analyzes their sentiment using either **Azure AI Language** or **AWS Comprehend**. Designed for testing purposes with free-tier API limits.
 
 ## Prerequisites
 
 - Python 3.7+
 - Twitter Developer Account with API access
-- Azure account with AI Language service (Free tier)
+- **For Azure**:
+  - Azure account with Language Service enabled
+  - Free-tier keys (200K text records/month)
+- **For AWS**:
+  - AWS account with Comprehend access
+  - IAM user with Comprehend permissions
+  - AWS CLI configured (optional)
 
 ## Installation
-
-1. Clone the repository:
-```
+```bash
+#1. Clone the repository:
 git clone https://github.com/gyzi/bitcoin-sentiment-analysis.git
 cd bitcoin-sentiment-analysis
-```
-2. Install required packages:
-```
+#2.Install required packages:
 pip install -r requirements.txt
 ```
+
 ## Configuration
-Set the following environment variables:
+Set environment variables in your shell or .env file:
+Twitter API: generate from here https://developer.twitter.com/en/portal/projects
+- CONSUMER_KEY: Twitter API consumer key
+- CONSUMER_SECRET: Twitter API consumer secret
+Azure AI Language:
+- AZURE_KEY: Language service key
+- AZURE_ENDPOINT: Language service endpoint
+AWS Comprehend:
+- AWS_ACCESS_KEY_ID: IAM user access key
+- AWS_SECRET_ACCESS_KEY: IAM user secret key
+- AWS_REGION (optional): Defaults to 'us-east-1'
 
-- `CONSUMER_KEY`: Your Twitter API consumer key
-- `CONSUMER_SECRET`: Your Twitter API consumer secret
-- `AZURE_KEY`: Your Azure AI Language key
-- `AZURE_ENDPOINT`: Your Azure AI Language endpoint
-
-You can set these in your shell or use a `.env` file with a package like `python-dotenv`.
 ## Usage
-
-Run the script:
+Run with default settings (30 tweets):
+```bash
+#For Azure 
+python bitcoin_tweets.py 
+#For AWS 
+python bitcoin_tweet_aws.py
 ```
-python bitcoin_tweets.py
-```
-Follow the prompts to authorize the Twitter API access. The script will then fetch tweets, perform sentiment analysis, and display the results.
+The script will:
+1. Authenticate with Twitter API
+2. Fetch recent Bitcoin-related tweets
+3. Perform sentiment analysis using your configured cloud service
+4. Save tweets to bitcoin_trends_tweets.json
+5. Display sentiment percentages
 
-## Features
+| Feature                | Azure AI Language                     | AWS Comprehend                      |
+|------------------------|---------------------------------------|-------------------------------------|
+| **Max Batch Size**     | 10 documents/request                  | 25 documents/request                |
+| **Sentiment Labels**   | Positive, Neutral, Negative, Mixed    | Positive, Neutral, Negative, Mixed  |
+| **Free Tier**          | 5,000 text records/month              | 50,000 text units/month             |
+| **Pricing**            | $1 per 1,000 text records             | $0.0001 per text unit               |
+| **Language Support**   | 125+ languages                        | 100+ languages                      |
+| **API Type**           | Dedicated resource endpoint           | Regional service endpoint           |
+| **Setup Complexity**   | Moderate (resource creation required) | Simple (IAM keys only)              |
 
-- Fetches recent Bitcoin-related tweets "by default is set 30"
-- Saves tweets to a JSON file
-- Performs sentiment analysis in batches of 10 tweets
-- Displays sentiment analysis results as percentages
+### Choose Azure if:
+You need opinion mining (aspect-based sentiment)
+You're already using Azure ecosystem
+Require strict compliance certifications
 
-## Contributing
+### Choose AWS if:
+You want higher batch sizes
+Prefer pay-per-use pricing model
+Need seamless integration with other AWS services
 
-Pull requests are welcome. For major changes, please open an issue first to discuss what you would like to change.
-
-## License
-
-[MIT](https://choosealicense.com/licenses/mit/)
